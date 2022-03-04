@@ -28,7 +28,7 @@ class VolumeIngredient(Ingredient):
             raise ValueError("Non volume units for VolumeIngredient")
         self.quantity *= self.units.value
         self.units = unit
-        self.quantity /= self.units.value
+        self.quantity = round(self.quantity / self.units.value, 2)
 
 
 @dataclass
@@ -46,7 +46,7 @@ class WeightIngredient(Ingredient):
             raise ValueError("Non weight units for WeightIngredient")
         self.quantity *= self.units.value
         self.units = unit
-        self.quantity /= self.units.value
+        self.quantity = round(self.quantity / self.units.value, 2)
 
 
 @dataclass
