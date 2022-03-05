@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS recipes(
     description text NOT NULL,
     steps text NOT NULL,
     cooking_time INTEGER,
-    servings INTEGER
+    servings INTEGER,
+    image BLOB
 );
 CREATE TABLE IF NOT EXISTS ingredients_recipes(
     ingredient_id INTEGER NOT NULL,
@@ -40,7 +41,8 @@ CREATE TABLE IF NOT EXISTS users(
     salt text NOT NULL,
     name text NOT NULL,
     bio text NOT NULL,
-    link text NOT NULL
+    link text NOT NULL,
+    profile_pic BLOB
 );
 CREATE TABLE IF NOT EXISTS cookbooks(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
