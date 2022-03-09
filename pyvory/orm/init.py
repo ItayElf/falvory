@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS recipes(
     description text NOT NULL,
     steps text NOT NULL,
     cooking_time INTEGER,
-    servings INTEGER,
+    servings text,
     image BLOB
 );
 CREATE TABLE IF NOT EXISTS ingredients_recipes(

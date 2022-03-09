@@ -15,14 +15,18 @@ class Recipe:
     ingredients: List[Ingredient]
     steps: List[str]
     cooking_time: Optional[int]  # minutes
-    servings: Optional[int]
+    servings: Optional[str]
     idx: Optional[int] = field(init=False)
 
     def scale(self, factor: float):
-        """Scales the ingredients by a factor"""
+        """Scales the ingredients and servings by a factor"""
         for i in range(len(self.ingredients)):
             self.ingredients[i].quantity *= factor
-        self.servings *= factor
+        # self.servings *= factor
+        nums = {n: int(n) * factor for n in re.findall(r"\d+?", self.servings)}
+        keys = sorted(nums.keys(), key=lambda x: int(x), reverse=factor > 1)
+        for k in keys:
+            self.servings = self.servings.replace(k, str(nums[k]) if nums[k] % 1 else str(int(nums[k])))
 
     def convert(self, units_map: Dict[str, str], to_celsius: bool):
         """Converts the recipe using a units_map and temperature units. Raises KeyError if invalid unit was used."""
