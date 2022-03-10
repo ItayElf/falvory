@@ -5,7 +5,9 @@ CREATE TABLE IF NOT EXISTS ingredients(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name text NOT NULL,
     quantity REAL NOT NULL,
-    units text NOT NULL
+    units text NOT NULL,
+    recipe_id INTEGER NOT NULL,
+    FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS recipes(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,12 +18,6 @@ CREATE TABLE IF NOT EXISTS recipes(
     cooking_time INTEGER,
     servings text,
     image BLOB
-);
-CREATE TABLE IF NOT EXISTS ingredients_recipes(
-    ingredient_id INTEGER NOT NULL,
-    recipe_id INTEGER NOT NULL,
-    FOREIGN KEY(ingredient_id) REFERENCES ingredients(id) ON DELETE CASCADE,
-    FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS sections(
     id INTEGER PRIMARY KEY AUTOINCREMENT,

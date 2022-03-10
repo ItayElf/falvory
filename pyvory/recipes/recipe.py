@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import json
 import re
 from dataclasses import dataclass, field
 from typing import List, Dict, Optional
@@ -16,7 +19,7 @@ class Recipe:
     steps: List[str]
     cooking_time: Optional[int]  # minutes
     servings: Optional[str]
-    idx: Optional[int] = field(init=False)
+    idx: Optional[int] = None
 
     def scale(self, factor: float):
         """Scales the ingredients and servings by a factor"""
@@ -40,6 +43,14 @@ class Recipe:
             new_ingredients.append(i)
         self.ingredients = new_ingredients
         self.steps = replace_temperature(self.steps, to_celsius)
+
+    @classmethod
+    def from_tup(cls, tup: tuple) -> Recipe:
+        idx, author, title, description, steps, cooking_time, servings, name_concat, quantity_concat, units_concat = tup
+        steps = json.loads(steps)
+        ings = [Ingredient.from_tup((n, float(q), u)) for (n, q, u) in
+                zip(name_concat.split("~"), quantity_concat.split("~"), units_concat.split("~"))]
+        return cls(author, title, description, ings, steps, cooking_time, servings, idx)
 
 
 def replace_temperature(steps: List[str], to_celsius: bool) -> List[str]:

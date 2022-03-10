@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from abc import ABC
 from typing import Union
@@ -11,6 +13,18 @@ class Ingredient(ABC):
     name: str
     quantity: float
     units: Union[str, Volume, Weight] = field(init=False)
+
+    @staticmethod
+    def from_tup(tup) -> Ingredient:
+        name, quantity, units = tup
+        if units in [u.name for u in Volume]:
+            units = Volume[units]
+            return VolumeIngredient(name, quantity, units)
+        elif units in [u.name for u in Weight]:
+            units = Weight[units]
+            return WeightIngredient(name, quantity, units)
+        else:
+            return AbstractIngredient(name, quantity, units)
 
 
 @dataclass
