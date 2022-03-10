@@ -1,9 +1,12 @@
-from graphene import ObjectType, String
+from graphene import ObjectType, Field, Int
+
+from pyvory.orm.recipes import get_recipe_by_id
+from web.object_types.recipe_object import RecipeObject
 
 
 class Query(ObjectType):
-    hello = String(name=String(required=True), required=True)
+    recipe = Field(RecipeObject, idx=Int(required=True))
 
     @staticmethod
-    def resolve_hello(root, info, name):
-        return f"Hello {name}!"
+    def resolve_recipe(_, __, idx):
+        return get_recipe_by_id(idx)
