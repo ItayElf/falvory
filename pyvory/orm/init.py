@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS sections_recipes(
 );
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username text NOT NULL UNIQUE,
+    email text NOT NULL UNIQUE,
     password text NOT NULL,
     salt text NOT NULL,
     name text NOT NULL,
