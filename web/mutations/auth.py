@@ -1,4 +1,5 @@
-from flask_graphql_auth import create_access_token, create_refresh_token
+from flask_graphql_auth import create_access_token, create_refresh_token, get_jwt_identity, \
+    mutation_jwt_refresh_token_required
 from graphene import Mutation, String
 
 from pyvory.orm.users import login
@@ -17,3 +18,15 @@ class Auth(Mutation):
         if not login(email, password):
             raise Exception("Auth failed: user is not registered.")
         return Auth(access_token=create_access_token(email), refresh_token=create_refresh_token(email))
+
+
+class Refresh(Mutation):
+    class Arguments:
+        refresh_token = String()
+
+    new_token = String()
+
+    @mutation_jwt_refresh_token_required
+    def mutate(self):
+        current_user = get_jwt_identity()
+        return Refresh(new_token=create_access_token(identity=current_user))
