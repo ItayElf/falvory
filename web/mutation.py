@@ -1,8 +1,9 @@
 from graphene import ObjectType
 
-from web.mutations.auth import Auth, Refresh
+from web.mutations.auth import Login, Refresh, Register
 
 
 class Mutation(ObjectType):
-    auth = Auth.Field()
+    login = Login.Field()
+    register = Register.Field()
     refresh = Refresh.Field()
