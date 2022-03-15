@@ -1,5 +1,6 @@
 import random
 import sqlite3
+import zlib
 from hashlib import md5
 from string import printable
 
@@ -7,6 +8,7 @@ from pyvory.orm import DBConnect
 from pyvory.social import User
 
 SALT_LEN = 32
+_blank_profile = open("pyvory/orm/blank_profile.png", "rb").read()
 
 _get_user = """
 SELECT u.id, u.name, u.bio, u.link, GROUP_CONCAT(f1.followed_id), GROUP_CONCAT(f2.follower_id), GROUP_CONCAT(p.id), GROUP_CONCAT(c.id)
@@ -45,10 +47,24 @@ def _generate_salt() -> str:
     return "".join([random.choice(printable) for _ in range(SALT_LEN)])
 
 
-def get_user_by_email(email: str):
+def get_user_by_email(email: str) -> User:
+    """Returns a user object based on its email"""
     with DBConnect() as c:
         c.execute(_get_user + "WHERE u.email = ?", (email,))
         tup = c.fetchone()
         if not tup or not tup[0]:
             raise FileNotFoundError(f"User with email '{email}' was not found")
         return User.from_tup(tup)
+
+
+def get_profile_pic(idx: int) -> bytes:
+    """Returns the profile picture of a user if it has one, otherwise returns the base picture"""
+    with DBConnect() as c:
+        c.execute("SELECT profile_pic FROM users WHERE id = ?", (idx,))
+        tup = c.fetchone()
+        if not tup:
+            raise FileNotFoundError(f"No user with id {idx} was found")
+        elif not tup[0]:
+            return _blank_profile
+        else:
+            return zlib.decompress(tup[0])

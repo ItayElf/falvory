@@ -20,7 +20,7 @@ class User:
     def from_tup(cls, tup) -> User:
         def _parse_concat(concat: str | None):
             if concat:
-                return [int(v) for v in concat.split(",")]
+                return list({int(v) for v in concat.split(",")})
             else:
                 return []
 
