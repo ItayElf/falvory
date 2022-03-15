@@ -9,6 +9,8 @@ from web.query import Query
 
 app = Flask(__name__)
 app.config["JWT_SECRET_KEY"] = JWT_KEY
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 10  # 10 minutes
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = 30  # 30 days
 auth = GraphQLAuth(app)
 
 schema = Schema(query=Query, mutation=Mutation)

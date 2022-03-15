@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/flavory.iml" filepath="$PROJECT_DIR$/.idea/flavory.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/flavory-backend.iml" filepath="$PROJECT_DIR$/.idea/flavory-backend.iml" />
     </modules>
   </component>
 </project>
