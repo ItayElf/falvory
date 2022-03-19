@@ -1,3 +1,5 @@
+import zlib
+
 from pyvory.orm import DBConnect
 from pyvory.recipes.recipe import Recipe
 
@@ -16,3 +18,13 @@ def get_recipe_by_id(idx: int) -> Recipe:
     if not tup:
         raise FileNotFoundError(f"No recipe with id {idx}")
     return Recipe.from_tup(tup)
+
+
+def get_recipe_picture(idx: int) -> bytes:
+    """Returns the picture associated with the recipe"""
+    with DBConnect() as c:
+        c.execute("SELECT image FROM recipes WHERE id=?", (idx,))
+        tup = c.fetchone()
+        if not tup or not tup[0]:
+            raise FileNotFoundError()
+        return zlib.decompress(tup[0])

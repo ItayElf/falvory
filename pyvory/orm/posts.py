@@ -20,6 +20,7 @@ LEFT JOIN cooked c2 ON c2.post_id = p.id
 LEFT JOIN users u4 ON u4.id = c2.user_id 
 LEFT JOIN follows f ON f.follower_id = (SELECT id FROM users WHERE email=?)
 GROUP BY p.id 
+ORDER BY p."timestamp" DESC
 LIMIT ? OFFSET ?"""
 
 
