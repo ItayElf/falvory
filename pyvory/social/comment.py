@@ -1,11 +1,15 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 
-from pyvory.social import User
 
-
-@dataclass
+@dataclass(frozen=True)
 class Comment:
     """Represents a comment commented on a post"""
-    commenter: User
+    commenter: str  # name of the user
     content: str
     timestamp: int  # int(time.time())
+
+    @classmethod
+    def from_tup(cls, tup) -> Comment:
+        return cls(*tup)
