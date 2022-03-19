@@ -68,3 +68,16 @@ def get_profile_pic(idx: int) -> bytes:
             return _blank_profile
         else:
             return zlib.decompress(tup[0])
+
+
+def get_profile_pic_by_name(name: str) -> bytes:
+    """Returns the profile picture of a user if it has one, otherwise returns the base picture"""
+    with DBConnect() as c:
+        c.execute("SELECT profile_pic FROM users WHERE name = ?", (name,))
+        tup = c.fetchone()
+        if not tup:
+            raise FileNotFoundError(f"No user with name {name} was found")
+        elif not tup[0]:
+            return _blank_profile
+        else:
+            return zlib.decompress(tup[0])

@@ -7,7 +7,7 @@ from flask_graphql_auth import GraphQLAuth
 from graphene import Schema
 
 from hidden import JWT_KEY
-from pyvory.orm.users import get_profile_pic
+from pyvory.orm.users import get_profile_pic, get_profile_pic_by_name
 from web.mutation import Mutation
 from web.query import Query
 
@@ -27,6 +27,15 @@ app.add_url_rule("/graphql", view_func=GraphQLView.as_view("graphql", graphiql=T
 def images_user_profile(idx):
     try:
         image = get_profile_pic(idx)
+        return send_file(io.BytesIO(image), mimetype="image/jpg")
+    except FileNotFoundError as e:
+        return str(e), 404
+
+
+@app.route("/images/users/<name>")
+def images_user_profile_name(name):
+    try:
+        image = get_profile_pic_by_name(name)
         return send_file(io.BytesIO(image), mimetype="image/jpg")
     except FileNotFoundError as e:
         return str(e), 404
