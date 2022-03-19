@@ -18,7 +18,7 @@ LEFT JOIN likes l ON l.post_id = p.id
 LEFT JOIN users u3 ON u3.id = l.user_id 
 LEFT JOIN cooked c2 ON c2.post_id = p.id 
 LEFT JOIN users u4 ON u4.id = c2.user_id 
-LEFT JOIN follows f ON f.follower_id = u.id 
+LEFT JOIN follows f ON f.follower_id = (SELECT id FROM users WHERE email=?)
 GROUP BY p.id 
 LIMIT ? OFFSET ?"""
 
@@ -26,7 +26,7 @@ LIMIT ? OFFSET ?"""
 def get_feed(email: str, items: int, offset: int) -> List[Post]:
     """Returns a feed of a user"""
     with DBConnect() as c:
-        c.execute(_get_feed, (items, offset))
+        c.execute(_get_feed, (email, items, offset))
         data = c.fetchall()
         if not data:
             raise Exception("No more posts")
