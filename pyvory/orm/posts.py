@@ -38,20 +38,22 @@ def get_feed(email: str, items: int, offset: int) -> List[Post]:
         return posts
 
 
-def like(email: str, post_id: int) -> None:
+def like(email: str, post_id: int) -> bool:
     """Like a post"""
     try:
         with DBConnect() as c:
             c.execute("INSERT INTO likes(post_id, user_id) VALUES(?, (SELECT id FROM users WHERE email=?))",
                       (post_id, email))
+        return True
     except sqlite3.IntegrityError:
         raise Exception("User already likes the post")
 
 
-def dislike(email: str, post_id: int) -> None:
+def dislike(email: str, post_id: int) -> bool:
     """Removes a like from a post"""
     with DBConnect() as c:
         c.execute("DELETE FROM likes WHERE post_id=? AND user_id=(SELECT id FROM users WHERE email=?)",
                   (post_id, email))
         if c.rowcount == 0:
             raise Exception("User did not like the post")
+        return True
