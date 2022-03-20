@@ -28,7 +28,6 @@ LIMIT ? OFFSET ?;
 
 def get_feed(email: str, items: int, offset: int) -> List[Post]:
     """Returns a feed of a user"""
-    print(f"{items=}, {offset=}")
     with DBConnect() as c:
         c.execute(_get_feed, (email, email, items, offset))
         data = c.fetchall()
@@ -56,4 +55,25 @@ def dislike(email: str, post_id: int) -> bool:
                   (post_id, email))
         if c.rowcount == 0:
             raise Exception("User did not like the post")
+        return True
+
+
+def cooked(email: str, post_id: int) -> bool:
+    """Marks a post as cooked"""
+    try:
+        with DBConnect() as c:
+            c.execute("INSERT INTO cooked(post_id, user_id) VALUES(?, (SELECT id FROM users WHERE email=?))",
+                      (post_id, email))
+        return True
+    except sqlite3.IntegrityError:
+        raise Exception("User already cooked the post")
+
+
+def uncooked(email: str, post_id: int) -> bool:
+    """Marks a post as uncooked"""
+    with DBConnect() as c:
+        c.execute("DELETE FROM cooked WHERE post_id=? AND user_id=(SELECT id FROM users WHERE email=?)",
+                  (post_id, email))
+        if c.rowcount == 0:
+            raise Exception("User did not cooked the post")
         return True

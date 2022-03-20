@@ -12,4 +12,4 @@ class Comment:
 
     @classmethod
     def from_tup(cls, tup) -> Comment:
-        return cls(*tup)
+        return cls(tup[0], tup[1], int(tup[2]))
