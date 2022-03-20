@@ -21,7 +21,9 @@ class Post:
     @classmethod
     def from_tup(cls, tup) -> Post:
         recipe = Recipe.from_tup(tup[1:11])
-        comments = list({Comment.from_tup(t) for t in zip(tup[11].split("~"), tup[12].split("~"), tup[13].split("~"))})
+        comments = list(
+            {Comment.from_tup(t) for t in zip(tup[11].split("~"), tup[12].split("~"), tup[13].split("~"))}) if tup[
+            11] else []
         likes = list({v for v in tup[14].split("~")}) if tup[14] else []
         cooked = list({v for v in tup[15].split("~")}) if tup[15] else []
         return cls(tup[0], recipe, comments, likes, cooked, tup[16], tup[17])

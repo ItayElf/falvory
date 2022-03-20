@@ -1,5 +1,5 @@
 # Project specifics
-main.db
+main*.db
 hidden.py
 
 # Byte-compiled / optimized / DLL files

@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS sections_recipes(
     section_id INTEGER NOT NULL,
     recipe_id INTEGER NOT NULL,
     FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE,
-    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id) ON DELETE CASCADE,
+    UNIQUE(section_id, recipe_id)
 );
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +55,8 @@ CREATE TABLE IF NOT EXISTS cookbooks_sections(
     cookbook_id INTEGER NOT NULL,
     section_id INTEGER NOT NULL,
     FOREIGN KEY(cookbook_id) REFERENCES cookbooks(id) ON DELETE CASCADE,
-    FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE
+    FOREIGN KEY(section_id) REFERENCES sections(id) ON DELETE CASCADE,
+    UNIQUE(cookbook_id, section_id)
 );
 CREATE TABLE IF NOT EXISTS comments(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,25 +77,29 @@ CREATE TABLE IF NOT EXISTS comments_posts(
     post_id INTEGER NOT NULL,
     comment_id INTEGER NOT NULL,
     FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE
+    FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE,
+    UNIQUE(post_id, comment_id)
 );
 CREATE TABLE IF NOT EXISTS follows(
     follower_id INTEGER NOT NULL,
     followed_id INTEGER NOT NULL,
     FOREIGN KEY(follower_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY(followed_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY(followed_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(follower_id, followed_id)
 );
 CREATE TABLE IF NOT EXISTS likes(
     post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(post_id, user_id)
 );
 CREATE TABLE IF NOT EXISTS cooked(
     post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE(post_id, user_id)
 );
 """
 

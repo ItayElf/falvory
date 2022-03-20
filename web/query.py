@@ -35,6 +35,5 @@ class Query(ObjectType):
 
     @staticmethod
     def resolve_suggestions(_, __, token):
-        print("heheheh")
         current_user_email = get_jwt_data(token, "access")["identity"]
         return get_suggestions(current_user_email)
