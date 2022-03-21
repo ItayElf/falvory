@@ -102,3 +102,26 @@ def get_suggestions(email: str) -> List[Tuple[str, str]]:
         c.execute(_get_suggestions, (email,))
         lst = c.fetchall()
         return lst
+
+
+def follow(email: str, name: str) -> bool:
+    """Adds a user as a follower of the other one"""
+    try:
+        with DBConnect() as c:
+            c.execute(
+                "INSERT INTO follows(follower_id, followed_id) VALUES((SELECT id FROM users WHERE email=?), (SELECT id FROM users WHERE name=?))",
+                (email, name))
+        return True
+    except sqlite3.IntegrityError:
+        raise Exception(f"User already follows {name}")
+
+
+def unfollow(email: str, name: str) -> bool:
+    """Removes a user from the followers of the other user"""
+    with DBConnect() as c:
+        c.execute(
+            "DELETE FROM follows WHERE follower_id=(SELECT id FROM users WHERE email=?) AND followed_id=(SELECT id FROM users WHERE name=?)",
+            (email, name))
+        if c.rowcount == 0:
+            raise Exception(f"User did not followed {name}")
+        return True

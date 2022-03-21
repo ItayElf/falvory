@@ -11,3 +11,5 @@ class Mutation(ObjectType):
     cooked = posts.Cooked.Field()
     uncooked = posts.Uncooked.Field()
     comment = posts.Comment.Field()
+    follow = auth.Follow.Field()
+    unfollow = auth.Unfollow.Field()

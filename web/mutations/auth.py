@@ -1,8 +1,8 @@
 from flask_graphql_auth import create_access_token, create_refresh_token, get_jwt_identity, \
-    mutation_jwt_refresh_token_required
-from graphene import Mutation, String
+    mutation_jwt_refresh_token_required, get_jwt_data
+from graphene import Mutation, String, Boolean, Int
 
-from pyvory.orm.users import login, register
+from pyvory.orm.users import login, register, follow, unfollow
 
 
 class Login(Mutation):
@@ -45,3 +45,29 @@ class Refresh(Mutation):
     def mutate(self):
         current_user = get_jwt_identity()
         return Refresh(new_token=create_access_token(identity=current_user))
+
+
+class Follow(Mutation):
+    success = Boolean(required=True)
+
+    class Arguments:
+        token = String(required=True)
+        name = String(required=True)
+
+    @staticmethod
+    def mutate(_, __, token, name):
+        current_user_email = get_jwt_data(token, "access")["identity"]
+        return Follow(success=follow(current_user_email, name))
+
+
+class Unfollow(Mutation):
+    success = Boolean(required=True)
+
+    class Arguments:
+        token = String(required=True)
+        name = String(required=True)
+
+    @staticmethod
+    def mutate(_, __, token, name):
+        current_user_email = get_jwt_data(token, "access")["identity"]
+        return Unfollow(success=unfollow(current_user_email, name))
