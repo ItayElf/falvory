@@ -1,4 +1,5 @@
 import sqlite3
+import time
 from typing import List
 
 from pyvory.orm import DBConnect
@@ -11,9 +12,8 @@ GROUP_CONCAT(c."timestamp", '~'), GROUP_CONCAT(u3.name, '~'), GROUP_CONCAT(u4.na
 FROM posts p
 LEFT JOIN users u ON u.id = p.poster_id
 LEFT JOIN recipes r ON r.id = p.recipe_id
-LEFT JOIN ingredients i ON i.recipe_id = r.id 
-LEFT JOIN comments_posts cp ON cp.post_id = p.id 
-LEFT JOIN comments c ON cp.comment_id = c.id 
+LEFT JOIN ingredients i ON i.recipe_id = r.id  
+LEFT JOIN comments c ON c.post_id = p.id 
 LEFT JOIN users u2 ON u2.id = c.commenter_id 
 LEFT JOIN likes l ON l.post_id = p.id 
 LEFT JOIN users u3 ON u3.id = l.user_id 
@@ -77,3 +77,16 @@ def uncooked(email: str, post_id: int) -> bool:
         if c.rowcount == 0:
             raise Exception("User did not cooked the post")
         return True
+
+
+def comment(email: str, post_id: int, content: str) -> bool:
+    """Adds a comment on the post"""
+    tstamp = int(time.time())
+    try:
+        with DBConnect() as c:
+            c.execute(
+                "INSERT INTO comments(post_id, commenter_id, content, \"timestamp\") VALUES(?, (SELECT id FROM users WHERE email=?), ?, ?)",
+                (post_id, email, content, tstamp))
+    except sqlite3.IntegrityError:
+        raise Exception(f"No user with email {email} was found")
+    return True

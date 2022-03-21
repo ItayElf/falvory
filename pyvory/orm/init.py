@@ -60,9 +60,11 @@ CREATE TABLE IF NOT EXISTS cookbooks_sections(
 );
 CREATE TABLE IF NOT EXISTS comments(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    post_id INTEGER NOT NULL,
     commenter_id INTEGER NOT NULL,
     content text NOT NULL,
     "timestamp" INTEGER NOT NULL,
+    FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
     FOREIGN KEY(commenter_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS posts(
@@ -72,13 +74,6 @@ CREATE TABLE IF NOT EXISTS posts(
     "timestamp" INTEGER NOT NULL,
     FOREIGN KEY(poster_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(recipe_id) REFERENCES recipes(id) ON DELETE CASCADE
-);
-CREATE TABLE IF NOT EXISTS comments_posts(
-    post_id INTEGER NOT NULL,
-    comment_id INTEGER NOT NULL,
-    FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY(comment_id) REFERENCES comments(id) ON DELETE CASCADE,
-    UNIQUE(post_id, comment_id)
 );
 CREATE TABLE IF NOT EXISTS follows(
     follower_id INTEGER NOT NULL,

@@ -1,14 +1,13 @@
 from graphene import ObjectType
-
-from web.mutations.auth import Login, Refresh, Register
-from web.mutations.posts import Like, Dislike, Cooked, Uncooked
+from web.mutations import posts, auth
 
 
 class Mutation(ObjectType):
-    login = Login.Field()
-    register = Register.Field()
-    refresh = Refresh.Field()
-    like = Like.Field()
-    dislike = Dislike.Field()
-    cooked = Cooked.Field()
-    uncooked = Uncooked.Field()
+    login = auth.Login.Field()
+    register = auth.Register.Field()
+    refresh = auth.Refresh.Field()
+    like = posts.Like.Field()
+    dislike = posts.Dislike.Field()
+    cooked = posts.Cooked.Field()
+    uncooked = posts.Uncooked.Field()
+    comment = posts.Comment.Field()
