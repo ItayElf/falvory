@@ -3,7 +3,7 @@ import time
 from typing import List
 
 from pyvory.orm import DBConnect
-from pyvory.social import Post
+from pyvory.social import Post, Comment
 
 _get_feed = """
 SELECT u.name, r.id, r.author, r.title, r.description, r.steps, r.cooking_time, r.servings, GROUP_CONCAT(i.name, '~'), 
@@ -79,7 +79,7 @@ def uncooked(email: str, post_id: int) -> bool:
         return True
 
 
-def comment(email: str, post_id: int, content: str) -> bool:
+def comment(email: str, post_id: int, content: str) -> Comment:
     """Adds a comment on the post"""
     tstamp = int(time.time())
     try:
@@ -87,6 +87,8 @@ def comment(email: str, post_id: int, content: str) -> bool:
             c.execute(
                 "INSERT INTO comments(post_id, commenter_id, content, \"timestamp\") VALUES(?, (SELECT id FROM users WHERE email=?), ?, ?)",
                 (post_id, email, content, tstamp))
+            c.execute("SELECT name FROM users WHERE email=?", (email,))
+            tup = c.fetchone()
+            return Comment(tup[0], content, tstamp)
     except sqlite3.IntegrityError:
         raise Exception(f"No user with email {email} was found")
-    return True
