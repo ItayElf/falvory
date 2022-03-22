@@ -26,6 +26,10 @@ class Ingredient(ABC):
         else:
             return AbstractIngredient(name, quantity, units)
 
+    @property
+    def units_name(self):
+        return self.units if isinstance(self.units, str) else self.units.name
+
 
 @dataclass
 class VolumeIngredient(Ingredient):

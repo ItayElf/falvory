@@ -1,6 +1,10 @@
+import base64
+import json
 import zlib
+from typing import Optional
 
 from pyvory.orm import DBConnect
+from pyvory.orm.users import get_user_by_email
 from pyvory.recipes.recipe import Recipe
 
 _get_recipe_base = """
@@ -28,3 +32,23 @@ def get_recipe_picture(idx: int) -> bytes:
         if not tup or not tup[0]:
             raise FileNotFoundError()
         return zlib.decompress(tup[0])
+
+
+def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Recipe:
+    """Updates a recipe with corresponding id and reruns the new one if the user is the owner of the recipe"""
+    user = get_user_by_email(email)
+    if recipe.idx not in user.posts:
+        raise Exception("Cannot edit recipe because the user doesn't own it")
+    with DBConnect() as c:
+        if image:
+            image = zlib.compress(base64.b64decode(image))
+        else:
+            image = c.execute("SELECT image FROM recipes WHERE id=?", (recipe.idx,)).fetchone()[0]
+        c.execute(
+            "UPDATE recipes SET author=?, title=?,description=?,steps=?,cooking_time=?,servings=?,image=? WHERE id=?",
+            (recipe.author, recipe.title, recipe.description, json.dumps(recipe.steps), recipe.cooking_time,
+             recipe.servings, image, recipe.idx))
+        c.execute("DELETE FROM ingredients WHERE recipe_id=?", (recipe.idx,))
+        c.executemany("INSERT INTO ingredients(name, quantity, units, recipe_id) VALUES(?, ?, ?, ?)",
+                      [(r.name, r.quantity, r.units_name, recipe.idx) for r in recipe.ingredients])
+    return recipe

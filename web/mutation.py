@@ -1,5 +1,5 @@
 from graphene import ObjectType
-from web.mutations import posts, auth
+from web.mutations import posts, auth, recipes
 
 
 class Mutation(ObjectType):
@@ -13,3 +13,4 @@ class Mutation(ObjectType):
     comment = posts.Comment.Field()
     follow = auth.Follow.Field()
     unfollow = auth.Unfollow.Field()
+    updateRecipe = recipes.UpdateRecipe.Field()
