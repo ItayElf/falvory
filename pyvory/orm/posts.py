@@ -5,7 +5,7 @@ from typing import List
 from pyvory.orm import DBConnect
 from pyvory.social import Post, Comment
 
-_get_feed = """
+_get_posts = """
 SELECT u.name, r.id, r.author, r.title, r.description, r.steps, r.cooking_time, r.servings, GROUP_CONCAT(i.name, '~'), 
 GROUP_CONCAT(i.quantity, '~'), GROUP_CONCAT(i.units, '~'), GROUP_CONCAT(u2.name, '~'), GROUP_CONCAT(c.content, '~'), 
 GROUP_CONCAT(c."timestamp", '~'), GROUP_CONCAT(u3.name, '~'), GROUP_CONCAT(u4.name, '~'), p."timestamp", p.id
@@ -19,22 +19,36 @@ LEFT JOIN likes l ON l.post_id = p.id
 LEFT JOIN users u3 ON u3.id = l.user_id 
 LEFT JOIN cooked c2 ON c2.post_id = p.id 
 LEFT JOIN users u4 ON u4.id = c2.user_id 
+"""
+
+_get_feed = """
 WHERE u.id IN (SELECT f2.followed_id FROM follows f2 JOIN users u5 ON u5.id = f2.follower_id WHERE u5.email=?) OR u.email=?
 GROUP BY p.id 
 ORDER BY p."timestamp" DESC
-LIMIT ? OFFSET ?;
-"""
+LIMIT ? OFFSET ?;"""
+
+_get_by_id = "WHERE p.id=?"
 
 
 def get_feed(email: str, items: int, offset: int) -> List[Post]:
     """Returns a feed of a user"""
     with DBConnect() as c:
-        c.execute(_get_feed, (email, email, items, offset))
+        c.execute(_get_posts + _get_feed, (email, email, items, offset))
         data = c.fetchall()
         if not data:
             raise Exception("No more posts")
         posts = [Post.from_tup(tup) for tup in data]
         return posts
+
+
+def get_post(idx: int) -> Post:
+    """Returns a post by id"""
+    with DBConnect() as c:
+        c.execute(_get_posts + _get_by_id, (idx,))
+        tup = c.fetchone()
+        if not tup:
+            raise Exception(f"No post with id {idx}")
+        return Post.from_tup(tup)
 
 
 def like(email: str, post_id: int) -> bool:

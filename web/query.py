@@ -1,7 +1,7 @@
 from flask_graphql_auth import get_jwt_data
 from graphene import ObjectType, Field, Int, String, List
 
-from pyvory.orm.posts import get_feed
+from pyvory.orm.posts import get_feed, get_post
 from pyvory.orm.recipes import get_recipe_by_id
 from pyvory.orm.users import get_user_by_email, get_suggestions
 from web.object_types.post_object import PostObject
@@ -11,10 +11,11 @@ from web.object_types.user_object import UserObject
 
 
 class Query(ObjectType):
-    recipe = Field(RecipeObject, idx=Int(required=True))
+    recipe = Field(RecipeObject, idx=Int(required=True), required=True)
     current_user = Field(UserObject, token=String(required=True))
     feed = List(PostObject, token=String(required=True), items=Int(required=True), offset=Int(required=True))
     suggestions = List(SuggestionObject, token=String(required=True), required=True)
+    post = Field(PostObject, required=True, idx=Int(required=True))
 
     @staticmethod
     def resolve_recipe(_, __, idx):
@@ -37,3 +38,7 @@ class Query(ObjectType):
     def resolve_suggestions(_, __, token):
         current_user_email = get_jwt_data(token, "access")["identity"]
         return get_suggestions(current_user_email)
+
+    @staticmethod
+    def resolve_post(_, __, idx):
+        return get_post(idx)
