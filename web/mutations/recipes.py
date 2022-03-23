@@ -22,10 +22,10 @@ class UpdateRecipe(Mutation):
         cooking_time = Int()
         servings = String()
         idx = Int(required=True)
-        image = String()
+        image = String(required=False)
 
     @staticmethod
-    def mutate(_, __, token, author, title, description, ingredients, steps, cooking_time, servings, idx, image):
+    def mutate(_, __, token, author, title, description, ingredients, steps, cooking_time, servings, idx, image=""):
         current_user_email = get_jwt_data(token, "access")["identity"]
         ingredients = [Ingredient.from_tup((i["name"], i["quantity"], i["units"])) for i in json.loads(ingredients)]
         cooking_time = cooking_time if cooking_time else None

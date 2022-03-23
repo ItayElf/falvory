@@ -40,8 +40,11 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
     if recipe.idx not in user.posts:
         raise Exception("Cannot edit recipe because the user doesn't own it")
     with DBConnect() as c:
-        if image:
-            image = zlib.compress(base64.b64decode(image))
+        if image is not None:
+            if image:
+                image = zlib.compress(base64.b64decode(image))
+            else:
+                image = None
         else:
             image = c.execute("SELECT image FROM recipes WHERE id=?", (recipe.idx,)).fetchone()[0]
         c.execute(
