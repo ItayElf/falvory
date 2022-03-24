@@ -1,6 +1,7 @@
 import io
 
 from flask import Flask, send_file
+from flask_caching import Cache
 from flask_cors import CORS
 from flask_graphql import GraphQLView
 from flask_graphql_auth import GraphQLAuth
@@ -20,32 +21,38 @@ CORS(app)
 auth = GraphQLAuth(app)
 
 schema = Schema(query=Query, mutation=Mutation)
+cache = Cache(config={'CACHE_TYPE': 'SimpleCache'})
 
 app.add_url_rule("/graphql", view_func=GraphQLView.as_view("graphql", graphiql=True, schema=schema))
+cache.init_app(app)
 
 
 @app.route("/images/users/<int:idx>")
+@cache.cached(timeout=30)
 def images_user_profile(idx):
     try:
         image = get_profile_pic(idx)
-        return send_file(io.BytesIO(image), mimetype="image/jpg")
+        return send_file(io.BytesIO(image), mimetype="image/webp")
     except FileNotFoundError as e:
         return str(e), 404
 
 
 @app.route("/images/users/<name>")
+@cache.cached(timeout=30)
 def images_user_profile_name(name):
     try:
         image = get_profile_pic_by_name(name)
-        return send_file(io.BytesIO(image), mimetype="image/jpg")
+        return send_file(io.BytesIO(image), mimetype="image/webp")
     except FileNotFoundError as e:
         return str(e), 404
 
 
 @app.route("/images/recipes/<int:idx>")
+@cache.cached(timeout=30)
 def images_recipe_image(idx):
     try:
         image = get_recipe_picture(idx)
-        return send_file(io.BytesIO(image), mimetype="image/jpg")
+        return send_file(io.BytesIO(image), mimetype="image/webp")
     except FileNotFoundError:
-        return f"No image for recipe with id {idx}", 404
+        # return f"No image for recipe with id {idx}", 404
+        return send_file(io.BytesIO(b""), mimetype="image/webp")

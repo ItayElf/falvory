@@ -1,7 +1,9 @@
 import base64
+import io
 import json
 import zlib
 from typing import Optional
+from PIL import Image
 
 from pyvory.orm import DBConnect
 from pyvory.orm.users import get_user_by_email
@@ -42,7 +44,7 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
     with DBConnect() as c:
         if image is not None:
             if image:
-                image = zlib.compress(base64.b64decode(image))
+                image = zlib.compress(_image_to_webp(base64.b64decode(image)))
             else:
                 image = None
         else:
@@ -60,7 +62,7 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
 def insert_recipe(r: Recipe, image: Optional[str] = None) -> Recipe:
     """Inserts a recipe and returns it with correct id"""
     if image:
-        image = zlib.compress(base64.b64decode(image))
+        image = zlib.compress(_image_to_webp(base64.b64decode(image)))
     else:
         image = None
     with DBConnect() as c:
@@ -71,3 +73,11 @@ def insert_recipe(r: Recipe, image: Optional[str] = None) -> Recipe:
         c.executemany("INSERT INTO ingredients(name, quantity, units, recipe_id) VALUES(?, ?, ?, ?)",
                       [(i.name, i.quantity, i.units_name, r.idx) for i in r.ingredients])
     return r
+
+
+def _image_to_webp(img: bytes) -> bytes:
+    img = Image.open(io.BytesIO(img))
+    img.convert("RGB")
+    output = io.BytesIO()
+    img.save(output, format="webp")
+    return output.getvalue()
