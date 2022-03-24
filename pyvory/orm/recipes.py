@@ -55,3 +55,19 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
         c.executemany("INSERT INTO ingredients(name, quantity, units, recipe_id) VALUES(?, ?, ?, ?)",
                       [(r.name, r.quantity, r.units_name, recipe.idx) for r in recipe.ingredients])
     return recipe
+
+
+def insert_recipe(r: Recipe, image: Optional[str] = None) -> Recipe:
+    """Inserts a recipe and returns it with correct id"""
+    if image:
+        image = zlib.compress(base64.b64decode(image))
+    else:
+        image = None
+    with DBConnect() as c:
+        c.execute(
+            "INSERT INTO recipes(author, title, description, steps, cooking_time, servings, image) VALUES(?,?,?,?,?,?,?)",
+            (r.author, r.title, r.description, json.dumps(r.steps), r.cooking_time, r.servings, image))
+        r.idx = c.execute("SELECT id FROM recipes WHERE rowid=?", (c.lastrowid,)).fetchone()[0]
+        c.executemany("INSERT INTO ingredients(name, quantity, units, recipe_id) VALUES(?, ?, ?, ?)",
+                      [(i.name, i.quantity, i.units_name, r.idx) for i in r.ingredients])
+    return r

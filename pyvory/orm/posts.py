@@ -1,8 +1,9 @@
 import sqlite3
 import time
-from typing import List
+from typing import List, Optional
 
 from pyvory.orm import DBConnect
+from pyvory.orm.recipes import insert_recipe
 from pyvory.social import Post, Comment
 
 _get_posts = """
@@ -106,3 +107,16 @@ def comment(email: str, post_id: int, content: str) -> Comment:
             return Comment(tup[0], content, tstamp)
     except sqlite3.IntegrityError:
         raise Exception(f"No user with email {email} was found")
+
+
+def insert_post(email: str, p: Post, image: Optional[str] = None) -> Post:
+    """Inserts a post end returns it back with correct id and timestamp"""
+    tstamp = int(time.time())
+    with DBConnect() as c:
+        p.recipe = insert_recipe(p.recipe, image)
+        c.execute(
+            "INSERT INTO posts(id, poster_id, recipe_id, \"timestamp\") VALUES(?, (SELECT id FROM users WHERE email=?), ?, ?)",
+            (p.recipe.idx, email, p.recipe.idx, tstamp))
+        p.idx = p.recipe.idx
+        p.timestamp = tstamp
+        return p

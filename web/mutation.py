@@ -13,4 +13,5 @@ class Mutation(ObjectType):
     comment = posts.Comment.Field()
     follow = auth.Follow.Field()
     unfollow = auth.Unfollow.Field()
-    updateRecipe = recipes.UpdateRecipe.Field()
+    update_recipe = recipes.UpdateRecipe.Field()
+    make_post = posts.MakePost.Field()
