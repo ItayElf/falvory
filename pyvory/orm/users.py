@@ -70,6 +70,16 @@ def get_user_by_email(email: str) -> User:
         return User.from_tup(tup)
 
 
+def get_user_by_name(name: str) -> User:
+    """Returns a user object based on its email"""
+    with DBConnect() as c:
+        c.execute(_get_user + "WHERE u.name = ?", (name,))
+        tup = c.fetchone()
+        if not tup or not tup[0]:
+            raise FileNotFoundError(f"User with name '{name}' was not found")
+        return User.from_tup(tup)
+
+
 def get_profile_pic(idx: int) -> bytes:
     """Returns the profile picture of a user if it has one, otherwise returns the base picture"""
     with DBConnect() as c:

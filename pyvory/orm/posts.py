@@ -30,6 +30,18 @@ LIMIT ? OFFSET ?;"""
 
 _get_by_id = "WHERE p.id=?"
 
+_get_by_name = """
+WHERE u.name = ?
+GROUP BY p.id 
+ORDER BY p."timestamp" DESC;
+"""
+
+_get_cooked = """
+WHERE u4.name = ?
+GROUP BY p.id 
+ORDER BY p."timestamp" DESC;
+"""
+
 
 def get_feed(email: str, items: int, offset: int) -> List[Post]:
     """Returns a feed of a user"""
@@ -50,6 +62,22 @@ def get_post(idx: int) -> Post:
         if not tup:
             raise Exception(f"No post with id {idx}")
         return Post.from_tup(tup)
+
+
+def get_posts_of(name: str) -> List[Post]:
+    """Returns all posts that were posted by given user"""
+    with DBConnect() as c:
+        c.execute(_get_posts + _get_by_name, (name,))
+        lst = c.fetchall()
+        return [Post.from_tup(tup) for tup in lst]
+
+
+def get_cooked_by(name: str) -> List[Post]:
+    """Returns all posts cooked by a user"""
+    with DBConnect() as c:
+        c.execute(_get_posts + _get_cooked, (name,))
+        lst = c.fetchall()
+        return [Post.from_tup(tup) for tup in lst]
 
 
 def like(email: str, post_id: int) -> bool:

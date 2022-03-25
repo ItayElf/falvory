@@ -1,9 +1,9 @@
 from flask_graphql_auth import get_jwt_data
 from graphene import ObjectType, Field, Int, String, List
 
-from pyvory.orm.posts import get_feed, get_post
+from pyvory.orm.posts import get_feed, get_post, get_posts_of, get_cooked_by
 from pyvory.orm.recipes import get_recipe_by_id
-from pyvory.orm.users import get_user_by_email, get_suggestions
+from pyvory.orm.users import get_user_by_email, get_suggestions, get_user_by_name
 from web.object_types.post_object import PostObject
 from web.object_types.recipe_object import RecipeObject
 from web.object_types.suggestion_object import SuggestionObject
@@ -16,6 +16,9 @@ class Query(ObjectType):
     feed = List(PostObject, token=String(required=True), items=Int(required=True), offset=Int(required=True))
     suggestions = List(SuggestionObject, token=String(required=True), required=True)
     post = Field(PostObject, required=True, idx=Int(required=True))
+    user = Field(UserObject, required=True, name=String(required=True))
+    posts_of = List(PostObject, name=String(required=True))
+    cooked_by = List(PostObject, name=String(required=True))
 
     @staticmethod
     def resolve_recipe(_, __, idx):
@@ -42,3 +45,15 @@ class Query(ObjectType):
     @staticmethod
     def resolve_post(_, __, idx):
         return get_post(idx)
+
+    @staticmethod
+    def resolve_user(_, __, name):
+        return get_user_by_name(name)
+
+    @staticmethod
+    def resolve_posts_of(_, __, name):
+        return get_posts_of(name)
+
+    @staticmethod
+    def resolve_cooked_by(_, __, name):
+        return get_cooked_by(name)
