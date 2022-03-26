@@ -12,10 +12,12 @@ SALT_LEN = 32
 _blank_profile = open("pyvory/orm/blank_profile.png", "rb").read()
 
 _get_user = """
-SELECT u.id, u.name, u.bio, u.link, GROUP_CONCAT(f1.followed_id), GROUP_CONCAT(f2.follower_id), GROUP_CONCAT(p.id), GROUP_CONCAT(c.id)
+SELECT u.id, u.name, u.bio, u.link, GROUP_CONCAT(u2.name), GROUP_CONCAT(u3.name), GROUP_CONCAT(p.id), GROUP_CONCAT(c.id)
 FROM users u
 LEFT JOIN follows f1 ON f1.follower_id = u.id 
 LEFT JOIN follows f2 ON f2.followed_id = u.id
+LEFT JOIN users u2 ON f1.followed_id = u2.id
+LEFT JOIN users u3 ON f2.follower_id = u3.id
 LEFT JOIN posts p ON p.poster_id = u.id 
 LEFT JOIN cookbooks c ON c.creator_id = u.id
 """

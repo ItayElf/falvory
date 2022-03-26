@@ -10,8 +10,8 @@ class User:
     name: str
     bio: str
     link: str
-    followers: List[int]  # ids
-    following: List[int]  # ids
+    followers: List[str]  # names
+    following: List[str]  # names
     posts: List[int]  # post ids
     cookbooks: List[int]  # cookbooks ids
     idx: Optional[int] = None
@@ -20,7 +20,10 @@ class User:
     def from_tup(cls, tup) -> User:
         def _parse_concat(concat: str | None):
             if concat:
-                return list({int(v) for v in concat.split(",")})
+                try:
+                    return list({int(v) for v in concat.split(",")})
+                except ValueError:
+                    return list({v for v in concat.split(",")})
             else:
                 return []
 
