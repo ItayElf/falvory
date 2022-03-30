@@ -137,3 +137,11 @@ def unfollow(email: str, name: str) -> bool:
         if c.rowcount == 0:
             raise Exception(f"User did not followed {name}")
         return True
+
+
+def search_users(query: str) -> List[User]:
+    """Returns all users with name that matches the query"""
+    query = f"%{query}%"
+    with DBConnect() as c:
+        c.execute(_get_user + "WHERE u.name LIKE ?", (query,))
+        return [User.from_tup(tup) for tup in c.fetchall()]

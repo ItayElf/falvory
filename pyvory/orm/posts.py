@@ -42,6 +42,11 @@ GROUP BY p.id
 ORDER BY p."timestamp" DESC;
 """
 
+_get_search = """
+WHERE r.title LIKE ? OR r.description LIKE ? OR u.name LIKE ? 
+GROUP BY p.id 
+ORDER BY p."timestamp" DESC"""
+
 
 def get_feed(email: str, items: int, offset: int) -> List[Post]:
     """Returns a feed of a user"""
@@ -148,3 +153,11 @@ def insert_post(email: str, p: Post, image: Optional[str] = None) -> Post:
         p.idx = p.recipe.idx
         p.timestamp = tstamp
         return p
+
+
+def search_posts(query: str) -> List[Post]:
+    """Returns all posts that match the recipe title, recipe description or poster name"""
+    query = f"%{query}%"
+    with DBConnect() as c:
+        c.execute(_get_posts + _get_search, (query, query, query))
+        return [Post.from_tup(tup) for tup in c.fetchall()]
