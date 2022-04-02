@@ -21,7 +21,8 @@ class Query(ObjectType):
     posts_of = List(PostObject, name=String(required=True))
     cooked_by = List(PostObject, name=String(required=True))
     search = Field(SearchObject, query=String(required=True))
-    explore = List(PostObject, seed=Int(required=True), items=Int(required=True), offset=Int(required=True))
+    explore = List(PostObject, token=String(required=True), seed=Int(required=True), items=Int(required=True),
+                   offset=Int(required=True))
 
     @staticmethod
     def resolve_recipe(_, __, idx):
@@ -66,5 +67,6 @@ class Query(ObjectType):
         return search_posts(query), search_users(query)
 
     @staticmethod
-    def resolve_explore(_, __, seed, items, offset):
-        return explore_posts(seed, items, offset)
+    def resolve_explore(_, __, token, seed, items, offset):
+        current_user_email = get_jwt_data(token, "access")["identity"]
+        return explore_posts(current_user_email, seed, items, offset)

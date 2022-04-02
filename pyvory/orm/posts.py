@@ -50,6 +50,7 @@ ORDER BY p."timestamp" DESC
 """
 
 _get_explore = """
+WHERE u.email != ? AND u.id NOT IN (SELECT followed_id FROM follows WHERE follower_id=(SELECT id FROM users WHERE email=?))
 GROUP BY p.id 
 ORDER BY p."timestamp" DESC
 """
@@ -170,10 +171,10 @@ def search_posts(query: str) -> List[Post]:
         return [Post.from_tup(tup) for tup in c.fetchall()]
 
 
-def explore_posts(seed: int, items: int, offset: int) -> List[Post]:
+def explore_posts(email: str, seed: int, items: int, offset: int) -> List[Post]:
     """Returns random posts"""
     with DBConnect() as c:
-        c.execute(_get_posts + _get_explore)
+        c.execute(_get_posts + _get_explore, (email, email))
         posts = [Post.from_tup(tup) for tup in c.fetchall()]
         random.Random(seed).shuffle(posts)
         res = posts[offset: offset + items]
