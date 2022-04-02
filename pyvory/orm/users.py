@@ -1,11 +1,13 @@
+import base64
 import random
 import sqlite3
 import zlib
 from hashlib import md5
 from string import printable
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from pyvory.orm import DBConnect
+from pyvory.orm.utils import image_to_webp
 from pyvory.social import User
 
 SALT_LEN = 32
@@ -145,3 +147,17 @@ def search_users(query: str) -> List[User]:
     with DBConnect() as c:
         c.execute(_get_user + "WHERE u.name LIKE ?", (query,))
         return [User.from_tup(tup) for tup in c.fetchall()]
+
+
+def update_user(email: str, name: str, bio: str, link: str, image: Optional[str] = None) -> None:
+    """Updates the user to the given user"""
+    with DBConnect() as c:
+        if image is not None:
+            if image:
+                image = zlib.compress(image_to_webp(base64.b64decode(image)))
+            else:
+                image = None
+        else:
+            image = c.execute("SELECT profile_pic FROM users WHERE email=?", (email,)).fetchone()[0]
+        c.execute("UPDATE users SET name=?, bio=?, link=?, profile_pic=? WHERE email=?",
+                  (name, bio, link, image, email))

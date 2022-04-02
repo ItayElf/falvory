@@ -1,8 +1,10 @@
+import sqlite3
+
 from flask_graphql_auth import create_access_token, create_refresh_token, get_jwt_identity, \
     mutation_jwt_refresh_token_required, get_jwt_data
 from graphene import Mutation, String, Boolean, Int
 
-from pyvory.orm.users import login, register, follow, unfollow
+from pyvory.orm.users import login, register, follow, unfollow, update_user
 
 
 class Login(Mutation):
@@ -71,3 +73,23 @@ class Unfollow(Mutation):
     def mutate(_, __, token, name):
         current_user_email = get_jwt_data(token, "access")["identity"]
         return Unfollow(success=unfollow(current_user_email, name))
+
+
+class EditUser(Mutation):
+    success = Boolean(required=True)
+
+    class Arguments:
+        token = String(required=True)
+        name = String(required=True)
+        bio = String(required=True)
+        link = String(required=True)
+        image = String()
+
+    @staticmethod
+    def mutate(_, __, token, name, bio, link, image=None):
+        current_user_email = get_jwt_data(token, "access")["identity"]
+        try:
+            update_user(current_user_email, name, bio, link, image)
+            return EditUser(success=True)
+        except sqlite3.IntegrityError:
+            return EditUser(success=False)

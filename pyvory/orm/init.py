@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS users(
     email text NOT NULL UNIQUE,
     password text NOT NULL,
     salt text NOT NULL,
-    name text NOT NULL,
+    name text NOT NULL UNIQUE,
     bio text NOT NULL,
     link text NOT NULL,
     profile_pic BLOB
