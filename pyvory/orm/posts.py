@@ -1,3 +1,4 @@
+import random
 import sqlite3
 import time
 from typing import List, Optional
@@ -45,7 +46,13 @@ ORDER BY p."timestamp" DESC;
 _get_search = """
 WHERE r.title LIKE ? OR r.description LIKE ? OR u.name LIKE ? 
 GROUP BY p.id 
-ORDER BY p."timestamp" DESC"""
+ORDER BY p."timestamp" DESC
+"""
+
+_get_explore = """
+GROUP BY p.id 
+ORDER BY p."timestamp" DESC
+"""
 
 
 def get_feed(email: str, items: int, offset: int) -> List[Post]:
@@ -161,3 +168,15 @@ def search_posts(query: str) -> List[Post]:
     with DBConnect() as c:
         c.execute(_get_posts + _get_search, (query, query, query))
         return [Post.from_tup(tup) for tup in c.fetchall()]
+
+
+def explore_posts(seed: int, items: int, offset: int) -> List[Post]:
+    """Returns random posts"""
+    with DBConnect() as c:
+        c.execute(_get_posts + _get_explore)
+        posts = [Post.from_tup(tup) for tup in c.fetchall()]
+        random.Random(seed).shuffle(posts)
+        res = posts[offset: offset + items]
+        if not res:
+            raise Exception("No more posts")
+        return res
