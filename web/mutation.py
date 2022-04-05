@@ -16,3 +16,4 @@ class Mutation(ObjectType):
     update_recipe = recipes.UpdateRecipe.Field()
     make_post = posts.MakePost.Field()
     edit_user = auth.EditUser.Field()
+    delete_post = posts.DeletePost.Field()

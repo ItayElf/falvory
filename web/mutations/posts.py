@@ -3,7 +3,7 @@ import json
 from graphene import Mutation, Boolean, String, Int, Field
 from flask_graphql_auth import get_jwt_data
 
-from pyvory.orm.posts import like, dislike, cooked, uncooked, comment as comment_orm, insert_post
+from pyvory.orm.posts import like, dislike, cooked, uncooked, comment as comment_orm, insert_post, delete_post
 from pyvory.orm.users import get_user_by_email
 from pyvory.recipes.ingredients import Ingredient
 from pyvory.recipes.recipe import Recipe
@@ -103,3 +103,16 @@ class MakePost(Mutation):
         poster = get_user_by_email(current_user_email)
         post = Post(poster.name, recipe, [], [], [], 0)
         return MakePost(post=insert_post(current_user_email, post, image))
+
+
+class DeletePost(Mutation):
+    success = Boolean(required=True)
+
+    class Arguments:
+        token = String(required=True)
+        post = Int(required=True)
+
+    @staticmethod
+    def mutate(_, __, token, post):
+        current_user_email = get_jwt_data(token, "access")["identity"]
+        return DeletePost(success=delete_post(current_user_email, post))

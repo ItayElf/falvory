@@ -5,6 +5,7 @@ from typing import List, Optional
 
 from pyvory.orm import DBConnect
 from pyvory.orm.recipes import insert_recipe
+from pyvory.orm.users import get_user_by_email
 from pyvory.social import Post, Comment
 
 _get_posts = """
@@ -181,3 +182,19 @@ def explore_posts(email: str, seed: int, items: int, offset: int) -> List[Post]:
         if not res:
             raise Exception("No more posts")
         return res
+
+
+def delete_post(email: str, idx: int) -> bool:
+    """Deletes a post if email match the owner"""
+    try:
+        with DBConnect() as c:
+            user = get_user_by_email(email)
+            c.execute(
+                "DELETE FROM recipes WHERE id=? AND (SELECT poster_id FROM posts WHERE id=?) = ?",
+                (idx, idx, user.idx))
+            c.execute("DELETE FROM ingredients WHERE recipe_id=? AND (SELECT poster_id FROM posts WHERE id=?) = ?",
+                      (idx, idx, user.idx))
+            c.execute("DELETE FROM posts WHERE poster_id=? AND id=?", (user.idx, idx))
+            return True
+    except FileNotFoundError:
+        return False
