@@ -6,7 +6,6 @@ from pyvory.orm.recipes import get_recipe_by_id
 from pyvory.orm.users import get_user_by_email, get_suggestions, get_user_by_name, search_users
 from web.object_types.post_object import PostObject
 from web.object_types.recipe_object import RecipeObject
-from web.object_types.search_object import SearchObject
 from web.object_types.suggestion_object import SuggestionObject
 from web.object_types.user_object import UserObject
 
@@ -20,7 +19,8 @@ class Query(ObjectType):
     user = Field(UserObject, required=True, name=String(required=True))
     posts_of = List(PostObject, name=String(required=True))
     cooked_by = List(PostObject, name=String(required=True))
-    search = Field(SearchObject, query=String(required=True))
+    users_search = List(UserObject, query=String(required=True), items=Int(required=True), offset=Int(required=True))
+    posts_search = List(PostObject, query=String(required=True), items=Int(required=True), offset=Int(required=True))
     explore = List(PostObject, token=String(required=True), seed=Int(required=True), items=Int(required=True),
                    offset=Int(required=True))
 
@@ -63,8 +63,12 @@ class Query(ObjectType):
         return get_cooked_by(name)
 
     @staticmethod
-    def resolve_search(_, __, query):
-        return search_posts(query), search_users(query)
+    def resolve_users_search(_, __, query, items, offset):
+        return search_users(query, items, offset)
+
+    @staticmethod
+    def resolve_posts_search(_, __, query, items, offset):
+        return search_posts(query, items, offset)
 
     @staticmethod
     def resolve_explore(_, __, token, seed, items, offset):

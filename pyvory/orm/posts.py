@@ -48,6 +48,7 @@ _get_search = """
 WHERE r.title LIKE ? OR r.description LIKE ? OR u.name LIKE ? 
 GROUP BY p.id 
 ORDER BY p."timestamp" DESC
+LIMIT ? OFFSET ?;
 """
 
 _get_explore = """
@@ -164,12 +165,15 @@ def insert_post(email: str, p: Post, image: Optional[str] = None) -> Post:
         return p
 
 
-def search_posts(query: str) -> List[Post]:
+def search_posts(query: str, items: int, offset: int) -> List[Post]:
     """Returns all posts that match the recipe title, recipe description or poster name"""
     query = f"%{query}%"
     with DBConnect() as c:
-        c.execute(_get_posts + _get_search, (query, query, query))
-        return [Post.from_tup(tup) for tup in c.fetchall()]
+        c.execute(_get_posts + _get_search, (query, query, query, items, offset))
+        res = [Post.from_tup(tup) for tup in c.fetchall()]
+        if not res:
+            raise Exception("No more posts")
+        return res
 
 
 def explore_posts(email: str, seed: int, items: int, offset: int) -> List[Post]:

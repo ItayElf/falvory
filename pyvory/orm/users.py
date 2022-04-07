@@ -141,12 +141,15 @@ def unfollow(email: str, name: str) -> bool:
         return True
 
 
-def search_users(query: str) -> List[User]:
+def search_users(query: str, items: int, offset: int) -> List[User]:
     """Returns all users with name that matches the query"""
     query = f"%{query}%"
     with DBConnect() as c:
-        c.execute(_get_user + "WHERE u.name LIKE ?", (query,))
-        return [User.from_tup(tup) for tup in c.fetchall()]
+        c.execute(_get_user + "WHERE u.name LIKE ? GROUP BY u.id LIMIT ? OFFSET ?", (query, items, offset))
+        res = [User.from_tup(tup) for tup in c.fetchall()]
+        if not res:
+            raise Exception("No more posts")
+        return res
 
 
 def update_user(email: str, name: str, bio: str, link: str, image: Optional[str] = None) -> None:
