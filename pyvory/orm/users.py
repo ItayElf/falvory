@@ -148,7 +148,7 @@ def search_users(query: str, items: int, offset: int) -> List[User]:
         c.execute(_get_user + "WHERE u.name LIKE ? GROUP BY u.id LIMIT ? OFFSET ?", (query, items, offset))
         res = [User.from_tup(tup) for tup in c.fetchall()]
         if not res:
-            raise Exception("No more posts")
+            raise Exception("No more users")
         return res
 
 
