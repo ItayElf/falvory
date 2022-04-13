@@ -45,7 +45,7 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
     with DBConnect() as c:
         if image is not None:
             if image:
-                image = zlib.compress(image_to_webp(base64.b64decode(image)))
+                image = zlib.compress(image_to_webp(base64.b64decode(image), True))
             else:
                 image = None
         else:
@@ -63,7 +63,7 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
 def insert_recipe(r: Recipe, image: Optional[str] = None) -> Recipe:
     """Inserts a recipe and returns it with correct id"""
     if image:
-        image = zlib.compress(image_to_webp(base64.b64decode(image)))
+        image = zlib.compress(image_to_webp(base64.b64decode(image)), True)
     else:
         image = None
     with DBConnect() as c:
