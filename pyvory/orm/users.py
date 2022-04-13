@@ -1,17 +1,18 @@
 import base64
+import os.path
 import random
 import sqlite3
 import zlib
 from hashlib import md5
 from string import printable
 from typing import List, Tuple, Optional
-
+from pyvory.orm.connection import ROOT_PATH
 from pyvory.orm import DBConnect
 from pyvory.orm.utils import image_to_webp
 from pyvory.social import User
 
 SALT_LEN = 32
-_blank_profile = open("pyvory/orm/blank_profile.png", "rb").read()
+_blank_profile = open(os.path.join(ROOT_PATH, "pyvory/orm/blank_profile.png"), "rb").read()
 
 _get_user = """
 SELECT u.id, u.name, u.bio, u.link, GROUP_CONCAT(u2.name), GROUP_CONCAT(u3.name), GROUP_CONCAT(p.id), GROUP_CONCAT(c.id)

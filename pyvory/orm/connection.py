@@ -2,7 +2,8 @@ import os
 import sqlite3
 import sys
 
-ROOT_PATH = os.path.normpath(os.path.dirname(sys.modules['__main__'].__file__))
+# ROOT_PATH = os.path.normpath(os.path.dirname(sys.modules['__main__'].__file__))
+ROOT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 DB_PATH = os.path.join(ROOT_PATH, "main.db")
 
 
