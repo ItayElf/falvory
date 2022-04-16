@@ -45,7 +45,7 @@ def update_recipe(email: str, recipe: Recipe, image: Optional[str] = None) -> Re
     with DBConnect() as c:
         if image is not None:
             if image:
-                image = zlib.compress(image_to_webp(base64.b64decode(image), True))
+                image = zlib.compress(image_to_webp(base64.b64decode(image)))
             else:
                 image = None
         else:
