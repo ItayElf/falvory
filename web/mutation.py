@@ -17,3 +17,4 @@ class Mutation(ObjectType):
     make_post = posts.MakePost.Field()
     edit_user = auth.EditUser.Field()
     delete_post = posts.DeletePost.Field()
+    delete_comment = posts.DeleteComment.Field()

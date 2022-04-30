@@ -202,3 +202,14 @@ def delete_post(email: str, idx: int) -> bool:
             return True
     except FileNotFoundError:
         return False
+
+
+def delete_comment(email: str, idx: int) -> bool:
+    """Deletes a comment if email match the poster id or the commenter id"""
+    user = get_user_by_email(email)
+
+    with DBConnect() as c:
+        c.execute(
+            "DELETE FROM comments WHERE id=? AND (commenter_id = ? OR (SELECT poster_id FROM posts WHERE id=(SELECT post_id FROM comments WHERE id=?))=?)",
+            (idx, user.idx, idx, user.idx))
+        return c.rowcount != 0
