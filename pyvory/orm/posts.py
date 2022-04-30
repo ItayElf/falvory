@@ -11,7 +11,7 @@ from pyvory.social import Post, Comment
 _get_posts = """
 SELECT u.name, r.id, r.author, r.title, r.description, r.steps, r.cooking_time, r.servings, GROUP_CONCAT(i.name, '~'), 
 GROUP_CONCAT(i.quantity, '~'), GROUP_CONCAT(i.units, '~'), GROUP_CONCAT(u2.name, '~'), GROUP_CONCAT(c.content, '~'), 
-GROUP_CONCAT(c."timestamp", '~'), GROUP_CONCAT(u3.name, '~'), GROUP_CONCAT(u4.name, '~'), p."timestamp", p.id
+GROUP_CONCAT(c."timestamp", '~'), GROUP_CONCAT(c.id, '~'), GROUP_CONCAT(u3.name, '~'), GROUP_CONCAT(u4.name, '~'), p."timestamp", p.id
 FROM posts p
 LEFT JOIN users u ON u.id = p.poster_id
 LEFT JOIN recipes r ON r.id = p.recipe_id
@@ -147,7 +147,9 @@ def comment(email: str, post_id: int, content: str) -> Comment:
                 (post_id, email, content, tstamp))
             c.execute("SELECT name FROM users WHERE email=?", (email,))
             tup = c.fetchone()
-            return Comment(tup[0], content, tstamp)
+            c.execute("SELECT id FROM comments WHERE post_id=? AND \"timestamp\"=? AND content=?",
+                      (post_id, tstamp, content))
+            return Comment(tup[0], content, tstamp, c.fetchone()[0])
     except sqlite3.IntegrityError:
         raise Exception(f"No user with email {email} was found")
 

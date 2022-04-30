@@ -5,3 +5,4 @@ class CommentObject(ObjectType):
     commenter = String(required=True)
     content = String(required=True)
     timestamp = Int(required=True)
+    idx = Int(required=True)
