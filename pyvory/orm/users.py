@@ -158,7 +158,7 @@ def update_user(email: str, name: str, bio: str, link: str, image: Optional[str]
     with DBConnect() as c:
         if image is not None:
             if image:
-                image = zlib.compress(image_to_webp(base64.b64decode(image), False))
+                image = zlib.compress(image_to_webp(base64.b64decode(image), 144))
             else:
                 image = None
         else:
